@@ -112,3 +112,21 @@ Directly relevant to enterprise AI roles at companies building conversational AI
 ---
 
 ## Requirements
+
+Install all dependencies with:
+
+```bash
+pip install -r requirements.txt
+```
+
+| Package | Purpose |
+|---|---|
+| langchain | LLM chaining and document loaders |
+| langgraph | State machine + HITL graph orchestration |
+| langchain-groq | Groq LLM integration |
+| qdrant-client | Vector database for RAG |
+| sentence-transformers | Text embeddings (all-MiniLM-L6-v2) |
+| fastapi | REST API backend |
+| uvicorn | ASGI server for FastAPI |
+| streamlit | Customer + agent dashboard UI |
+| python-dotenv | Environment variable management |
