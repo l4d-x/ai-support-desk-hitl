@@ -1,10 +1,16 @@
 from qdrant_client import QdrantClient
 from qdrant_client.models import VectorParams, Distance, PointStruct
 from sentence_transformers import SentenceTransformer
+from dotenv import load_dotenv
+import os
 import uuid
 
-# In-memory Qdrant
-client = QdrantClient(":memory:")
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '..', '.env'))
+
+client = QdrantClient(
+    url=os.getenv("QDRANT_URL"),
+    api_key=os.getenv("QDRANT_API_KEY")
+)
 model = SentenceTransformer("all-MiniLM-L6-v2")
 
 COLLECTION_NAME = "support_kb"
@@ -38,6 +44,11 @@ FAQ_DATA = [
 ]
 
 def index_faq():
+    existing = client.collection_exists(COLLECTION_NAME)
+    if existing:
+        print("Collection already exists, skipping indexing.")
+        return
+
     client.create_collection(
         collection_name=COLLECTION_NAME,
         vectors_config=VectorParams(size=384, distance=Distance.COSINE)
@@ -54,7 +65,7 @@ def index_faq():
         ))
 
     client.upsert(collection_name=COLLECTION_NAME, points=points)
-    print(f"Indexed {len(points)} FAQ entries into Qdrant.")
+    print(f"Indexed {len(points)} FAQ entries into Qdrant Cloud.")
 
 def search_kb(query: str, top_k: int = 3):
     query_vector = model.encode(query).tolist()
@@ -73,5 +84,4 @@ def search_kb(query: str, top_k: int = 3):
         for r in results.points
     ]
 
-# Run on import
 index_faq()
