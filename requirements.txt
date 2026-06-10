@@ -1,0 +1,9 @@
+langchain
+langgraph
+langchain-groq
+qdrant-client
+sentence-transformers
+fastapi
+uvicorn
+streamlit
+python-dotenv
