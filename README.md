@@ -3,7 +3,7 @@
 ## How It Works
 
 ### Ticket Flow — Auto Resolved
-1. Customer submits query via frontend
+1. Customer submits query via frontend 
 2. RAG agent searches Qdrant knowledge base
 3. Groq LLM generates draft response
 4. Confidence score > 0.75 → auto-sent to customer
