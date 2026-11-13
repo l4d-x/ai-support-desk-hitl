@@ -1,0 +1,42 @@
+[project]
+name = "ai-support-desk-hitl"
+version = "0.1.0"
+description = "Multi-agent AI customer support with LangGraph human-in-the-loop, RAG (Qdrant + Groq LLaMA 3.3), FastAPI and Streamlit"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "langgraph",
+    "langgraph-checkpoint-postgres",
+    "psycopg[binary,pool]",
+    "langchain-groq",
+    "qdrant-client",
+    "fastembed",
+    "python-dotenv",
+    "pydantic",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "httpx",
+    "ruff",
+    "streamlit",  # UI smoke tests (production UI deps live in ui/requirements.txt)
+    "requests",
+    "pgserver",  # embedded Postgres so the persistence tests run locally without Docker
+]
+
+[tool.setuptools.packages.find]
+include = ["src*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]
