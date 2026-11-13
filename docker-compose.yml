@@ -1,0 +1,37 @@
+# Local full stack: Postgres + API + Streamlit.   docker compose up --build
+# Needs a .env with GROQ_API_KEY and API_KEY (see .env.example). Qdrant runs in-memory unless
+# QDRANT_URL is set.
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: support
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d support"]
+      interval: 3s
+      retries: 20
+
+  api:
+    build: .
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/support
+    depends_on:
+      db:
+        condition: service_healthy
+    ports: ["8000:8000"]
+
+  ui:
+    image: python:3.12-slim
+    working_dir: /app
+    volumes: ["./ui:/app"]
+    environment:
+      API_URL: http://api:8000
+      API_KEY: ${API_KEY}
+      AGENT_PASSWORD: ${AGENT_PASSWORD:-demo}
+    command: >
+      sh -c "pip install -q -r requirements.txt &&
+             streamlit run Home.py --server.port 8501 --server.address 0.0.0.0"
+    depends_on: [api]
+    ports: ["8501:8501"]

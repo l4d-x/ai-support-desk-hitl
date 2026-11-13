@@ -1,0 +1,30 @@
+# Render Blueprint. Create via Dashboard > New > Blueprint. Secrets (sync: false) are entered
+# in the Render dashboard, never committed.
+services:
+  - type: web
+    name: ai-support-desk-api
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: API_KEY # shared secret; also goes in Streamlit secrets
+        sync: false
+      - key: DATABASE_URL # Neon connection string (sslmode=require)
+        sync: false
+      - key: QDRANT_URL
+        sync: false
+      - key: QDRANT_API_KEY
+        sync: false
+      - key: LLM_MODEL
+        value: openai/gpt-oss-120b
+      - key: CONFIDENCE_THRESHOLD
+        value: "0.50"
+      - key: DAILY_TICKET_LIMIT
+        value: "200"
+      - key: EMAIL_DAILY_LIMIT
+        value: "10"
+      - key: MINUTE_TICKET_LIMIT
+        value: "12"
