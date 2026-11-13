@@ -1,0 +1,21 @@
+name: Keep free tiers awake
+
+# Qdrant Cloud free clusters are suspended after ~1 week of inactivity (deleted after ~4), and
+# Neon/Render sleep when idle. /health/deep touches Postgres and Qdrant; the retries cover the
+# ~1 minute Render cold start.
+on:
+  schedule:
+    - cron: "17 6 */4 * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping API
+        env:
+          API_URL: ${{ secrets.API_URL }}
+        run: |
+          if [ -z "$API_URL" ]; then echo "Set the API_URL repository secret"; exit 1; fi
+          curl --fail --silent --show-error --retry 8 --retry-delay 15 --retry-all-errors \
+               --max-time 90 "$API_URL/health/deep"
