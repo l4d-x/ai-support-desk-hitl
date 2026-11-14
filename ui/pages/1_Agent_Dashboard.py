@@ -17,8 +17,16 @@ def check_password() -> bool:
         return False
     if st.session_state.get("agent_ok"):
         return True
+    st.info(
+        "**Demo:** hover the **?** next to the password box to see the demo password. "
+        "Submit a refund ticket on the Customer page first, then come back to review it."
+    )
     with st.form("login"):
-        pw = st.text_input("Password", type="password")
+        pw = st.text_input(
+            "Password",
+            type="password",
+            help=f"Demo password: {expected}  (shared demo password, don't reuse it anywhere)",
+        )
         if st.form_submit_button("Sign in"):
             if hmac.compare_digest(pw.encode(), expected.encode()):
                 st.session_state.agent_ok = True
