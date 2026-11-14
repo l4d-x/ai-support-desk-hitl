@@ -75,3 +75,13 @@ def test_guard_not_called_when_already_escalating(monkeypatch):
     monkeypatch.setattr(rag_agent, "search_kb", lambda q: [])
     out = rag_agent.run_rag_agent("q", "a@example.com")
     assert calls == [] and out["needs_escalation"] is True
+
+
+def test_clean_strips_wrapping_quotes():
+    from src.config import _clean
+
+    assert (
+        _clean('"postgresql://u:p@h/db?sslmode=require"') == "postgresql://u:p@h/db?sslmode=require"
+    )
+    assert _clean("'abc'") == "abc"
+    assert _clean("  ") is None

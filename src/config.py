@@ -41,6 +41,8 @@ class Settings:
 
 def _clean(value: str | None) -> str | None:
     value = (value or "").strip()
+    if len(value) >= 2 and value[0] == value[-1] and value[0] in "\"'":
+        value = value[1:-1].strip()  # tolerate values pasted with their .env quotes
     return value or None
 
 
