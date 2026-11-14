@@ -7,6 +7,7 @@
 
 from __future__ import annotations
 
+import logging
 import threading
 from collections import defaultdict
 from collections.abc import Callable
@@ -14,6 +15,8 @@ from datetime import UTC, datetime
 from typing import Protocol
 
 from langgraph.checkpoint.memory import MemorySaver
+
+log = logging.getLogger("uvicorn.error")
 
 
 def today() -> str:
@@ -125,6 +128,26 @@ class PostgresStore:
         return row["count"] <= limit
 
 
+def describe_url(url: str) -> str:
+    """Non-secret summary of a connection URL, for diagnosing bad env values."""
+    from urllib.parse import urlparse
+
+    try:
+        u = urlparse(url)
+        pw = u.password or ""
+        brackets = "<" in url or ">" in url
+        quotes = any(c in url for c in "\"'")
+        spaces = any(c.isspace() for c in url)
+        return (
+            f"scheme={u.scheme!r} user={u.username!r} host={u.hostname!r} db={u.path!r} "
+            f"query={u.query!r} password_len={len(pw)} password_starts={pw[:4]!r} "
+            f"has_angle_brackets={brackets} has_quotes={quotes} has_spaces={spaces} "
+            f"total_len={len(url)}"
+        )
+    except Exception as exc:  # noqa: BLE001
+        return f"unparseable ({type(exc).__name__}), total_len={len(url)}"
+
+
 def make_persistence(database_url: str | None) -> tuple[object, Store, Callable[[], None]]:
     """Returns (checkpointer, store, close)."""
     if not database_url:
@@ -145,7 +168,11 @@ def make_persistence(database_url: str | None) -> tuple[object, Store, Callable[
         kwargs={"autocommit": True, "prepare_threshold": 0, "row_factory": dict_row},
         open=True,
     )
-    pool.wait(timeout=30)
+    try:
+        pool.wait(timeout=30)
+    except Exception:
+        log.error("Database connection failed. Received: %s", describe_url(database_url))
+        raise
     checkpointer = PostgresSaver(pool)
     checkpointer.setup()
     store = PostgresStore(pool)
