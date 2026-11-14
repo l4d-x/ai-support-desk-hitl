@@ -3,10 +3,26 @@
 A customer-support backend that answers routine tickets automatically with RAG and sends anything
 uncertain, or any refund, to a human manager before the customer sees a reply.
 
-**Live demo:** _add your Streamlit URL here after deploying (see [docs/DEPLOY.md](docs/DEPLOY.md))_
+**Live demo:** https://ai-support-desk.streamlit.app/
 &nbsp;·&nbsp; **Stack:** LangGraph · FastAPI · Streamlit · Qdrant · fastembed (MiniLM) · Groq · Postgres
 
+> Hosted on free tiers (Streamlit Cloud, Render, Neon). If the demo has been idle, the API takes
+> about a minute to wake up; the page shows a "waking up" message while it does.
+
 <!-- Add screenshots: docs/img/customer.png and docs/img/agent.png -->
+
+### Try it in two minutes
+
+1. **Customer page:** ask a question such as *"What is your return policy?"* to see an instant,
+   knowledge-base-grounded answer.
+2. **Escalation path:** open *Refund request*, use `alice@example.com`, order `ORD001`, amount `50`
+   and send. The ticket is held for a human instead of being answered.
+3. **Agent Dashboard** (sidebar): hover the **?** next to the password box for the demo password,
+   then review the ticket, edit the draft if you like, and approve or reject it.
+4. Back on the Customer page, use **Check ticket status** with the ticket id and email to see the
+   reply the manager sent.
+
+The demo is shared: use fake emails, and note that other visitors can see the queue.
 
 ## How it works
 
